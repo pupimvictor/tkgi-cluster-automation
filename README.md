@@ -1,5 +1,15 @@
 # Cluster Operations Pipeline
 
+## Cluster Operations
+
+The cluster operations are composed by 2 pipelines:
+
+* **set-clusters-pipeline** reads the `vars/((foundation))/k8s-clusters.yml` file and creates a pipeline for each one of the clusters described in the file. The pipelines created by the Job set-clusters-pipeline are named with the name of the cluster.
+
+* __<cluster_name> pipeline__: Contains all of the jobs responsible for managing a cluster lifecycle, including `create-cluster`, `set-cluster-runtime`, `upgrade-cluster`, etc.
+
+See the cluster pipeline docs here: [cluster pipeline](/pipeline/cluster-operations/README.md)
+
 ## Base Operations
 
 ### Create Cluster
