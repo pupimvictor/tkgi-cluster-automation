@@ -1,0 +1,18 @@
+#AWS Config
+MasterInstanceProfile: CPInstanceProfile-TryOut
+WorkerInstanceProfile: OpsManagerInstanceProfile-Tryout
+AWS-Region: us-east-1
+AZ1-Name: us-east-1a
+AZ2-Name: us-east-1b
+AZ3-Name: us-east-1c
+
+#API Hostname
+pks-api: api-tkgi-to.host.com
+pivotal-container-service_pks_tls.cert_pem: ((tkgi-tls.certificate))
+pivotal-container-service_pks_tls.private_key_pem: ((tkgi-tls.private_key))
+properties_uaa_ldap_credentials.identity: "CN=tanzuldap,OU=Service Accounts,OU=Corporate,DC=host,DC=com"
+properties_uaa_ldap_credentials.password: "((service-account.password))"
+
+#Network Config
+PodCIDR: 10.200.0.0/16
+ServiceClusterCIDR: 10.100.200.0/24

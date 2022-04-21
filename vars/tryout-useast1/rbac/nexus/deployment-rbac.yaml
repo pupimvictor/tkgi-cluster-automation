@@ -1,0 +1,82 @@
+###############################################################
+#
+# Creator: host Cloud Security
+# Description: Create RBAC Role for Apps Deployment
+#
+###############################################################
+
+###############################################################
+#
+#  Cluster role cf:deployment with permissions to deploy
+#  applications
+#
+###############################################################
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cf:deployment
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - namespaces
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - services
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - create
+  - patch
+  - update
+
+---
+###############################################################
+#
+#  Cluster role binding maps to cf:deployment cluster role
+#  for apps deployment
+#
+###############################################################
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cf:deployment
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cf:deployment
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: oidc:AWS-K8sDeployment-Tryout

@@ -1,0 +1,30 @@
+---
+platform: linux
+
+inputs:
+- name: platform-automation-tasks
+- name: custom-tasks # source containing the custom task file
+- name: env # contains the env file with target OpsMan Information
+- name: config # contains the platform config 
+- name: vars # contains the platform config
+
+params:
+  ENV_FILE: env.yml
+  
+  CONFIG_FILE:
+  #  Required
+  # file with addon config
+  VARS_FILES:
+  # - Option
+  # - Filepath of vars files to interpolate into FILE_TO_APPLY
+  ENVIRONMENTID:
+  APITOKEN:
+  APIURL:
+  CLUSTER_NAME: ((CLUSTER_NAME))
+  HOSTGROUP: ((CLUSTER_NAME)) 
+  CLUSTER_NAME: ((CLUSTER_NAME))
+  HOSTTAGS: cluster_name=((CLUSTER_NAME))
+  
+
+run:
+  path: custom-tasks/tasks/install_bosh_addon.sh

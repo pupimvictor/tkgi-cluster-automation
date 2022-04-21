@@ -1,0 +1,377 @@
+---
+resource_types:
+  - name: pivnet
+    type: docker-image
+    source:  
+      repository: pivotalcf/pivnet-resource
+      tag: latest
+
+resources:
+############
+#### S3 ####
+############
+# Platform-Automation
+- name: platform-automation-tasks
+  type: s3
+  icon: cloud_download
+  source:
+    access_key_id: ((s3_account.username))
+    bucket: ((s3_products_bucket))
+    region_name: us-east-1
+    secret_access_key: ((s3_account.password))
+    regexp: platform-automation-tasks\/platform-automation-tasks-(.*).zip
+- name: platform-automation-image
+  type: s3
+  icon: cloud_download
+  source:
+    access_key_id: ((s3_account.username))
+    bucket: ((s3_products_bucket))
+    region_name: us-east-1
+    secret_access_key: ((s3_account.password))
+    regexp: platform-automation-image\/platform-automation-image-(.*).tgz
+- name: tkgi-cli
+  type: s3
+  icon: cloud_download
+  source:
+    access_key_id: ((s3_account.username))
+    bucket: ((s3_products_bucket))
+    region_name: us-east-1
+    secret_access_key: ((s3_account.password))
+    regexp: clis\/tkgi-(.*)
+- name: kubectl-cli
+  type: s3
+  icon: cloud_download
+  source:
+    access_key_id: ((s3_account.username))
+    bucket: ((s3_products_bucket))
+    region_name: us-east-1
+    secret_access_key: ((s3_account.password))
+    regexp: clis\/kubectl-(.*)
+    
+# TKGI-Backup
+- name: tkgi-clusters-backup
+  type: s3
+  icon: cloud_download
+  source:
+    access_key_id: ((s3_local_account.username))
+    bucket: ((s3_backup_bucket))
+    region_name: us-east-1
+    secret_access_key: ((s3_local_account.password))
+    regexp: cluster_(.*).tgz
+    initial_path: cluster_cf-nexus-dev_20201214202020.tgz
+
+
+#############
+#### GIT ####
+#############
+- name: configuration
+  type: git
+  icon: git
+  source:
+    username: ((service-account.username))
+    password: ((service-account.password))
+    uri: ((platform-automation-uri))
+    branch: master
+    skip_ssl_verification: true
+
+- name: vars
+  type: git
+  icon: git
+  source:
+    username: ((service-account.username))
+    password: ((service-account.password))
+    uri: ((platform-automation-uri))
+    branch: master
+    skip_ssl_verification: true
+
+- name: custom-tasks
+  type: git
+  icon: git
+  source:
+    username: ((service-account.username))
+    password: ((service-account.password))
+    uri: ((platform-automation-uri))
+    branch: master
+    skip_ssl_verification: true
+
+##################
+#### Triggers ####
+##################
+
+# This task is used in multiple jobs
+# The yaml anchor "*prepare-tasks-with-secrets" is used in its place
+
+prepare-tasks-with-secrets: &prepare-tasks-with-secrets
+  image: platform-automation-image
+  file: platform-automation-tasks/tasks/prepare-tasks-with-secrets.yml
+  params:
+    CONFIG_PATHS: config/config/cluster-operations
+    VARS_PATHS: vars/vars/((foundation))
+  input_mapping:
+    tasks: platform-automation-tasks
+    config: configuration
+    vars: configuration
+  output_mapping:
+    tasks: platform-automation-tasks
+
+# This task is used in multiple jobs
+# The yaml anchor "*prepare-config-with-secrets" is used in its place
+prepare-config-with-secrets: &prepare-config-with-secrets
+  image: platform-automation-image
+  file: platform-automation-tasks/tasks/credhub-interpolate.yml
+  input_mapping:
+    files: configuration
+  params:
+    OM_SKIP_SSL_VALIDATION: true
+    CREDHUB_CLIENT: ((credhub.username))
+    CREDHUB_SECRET: ((credhub.password))
+    CREDHUB_SERVER: ((credhub_server))
+    CREDHUB_CA_CERT: ((credhub_ca_cert.certificate))
+    PREFIX: /concourse/((foundation))
+    INTERPOLATION_PATHS: env state tasks config
+    SKIP_MISSING: true
+  output_mapping:
+    interpolated-files: configuration
+
+# These credentials are used in multiple jobs for backup and restore
+# The yaml anchor "*opsman_credentials" is used in its place
+opsman_credentials: &opsman_credentials
+  OPSMAN_URL: ((opsman_url))
+  OPSMAN_USERNAME: ((opsman-user.username))
+  OPSMAN_PASSWORD: ((opsman-user.password))
+  OPSMAN_PRIVATE_KEY: ((opsman-ssh.private_key))
+  SKIP_SSL_VALIDATION: "true"
+
+jobs:
+- name: create-cluster
+  serial_groups: ["setup-cluster"]
+  plan:
+  - in_parallel:
+    - get: platform-automation-image
+      params:
+        globs: ["*aws*"]
+        unpack: true    
+    - get: platform-automation-tasks
+      params:
+        globs: ["*tasks*"]
+        unpack: true
+    - get: tkgi-cli
+      params:
+        globs: ["*tkgi*"]
+        unpack: false
+    - get: configuration
+    - get: custom-tasks
+    - get: kubectl-cli
+  - task: prepare-tasks-with-secrets
+    <<: *prepare-tasks-with-secrets
+  - task: prepare-config-with-secrets
+    <<: *prepare-config-with-secrets
+  - task: create-k8s-cluster
+    image: platform-automation-image
+    file: custom-tasks/tasks/create_tkgi_clusters.yml
+    input_mapping:
+      env: configuration
+      config: configuration
+    params:
+      CLUSTER_NAME: ((CLUSTER_NAME))
+      EXTERNAL_HOSTNAME: ((EXTERNAL_HOSTNAME))
+      PLAN: ((PLAN))
+      K8S_PROFILE: ((K8S_PROFILE))
+      NETWORK_PROFILE: ((NETWORK_PROFILE))
+      NUM_NODES: ((NUM_NODES))
+      TAGS: ((TAGS))
+      TKGI_API_ENDPOINT: ((tkgi-api))   
+      ENV_FILE: &env-path env/((foundation)).yml
+
+- name: set-rbac
+  serial: true
+  serial_groups: [ setup-cluster ]
+  plan:
+  - in_parallel:
+    - get: platform-automation-image
+      params:
+        globs: ["*aws*"]
+        unpack: true
+        passed: [ create-cluster ]
+      trigger: true     
+    - get: platform-automation-tasks
+      params:
+        globs: ["*tasks*"]
+        unpack: true
+    - get: tkgi-cli
+      params:
+        globs: ["*tkgi*"]
+        unpack: false
+    - get: configuration
+    - get: vars
+    - get: custom-tasks
+    - get: kubectl-cli
+  - task: prepare-config-with-secrets
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/credhub-interpolate.yml
+    input_mapping:
+      files: configuration
+    params:
+      OM_SKIP_SSL_VALIDATION: true
+      CREDHUB_CLIENT: ((credhub.username))
+      CREDHUB_SECRET: ((credhub.password))
+      CREDHUB_SERVER: ((credhub_server))
+      CREDHUB_CA_CERT: ((credhub_ca_cert.certificate))
+      PREFIX: /concourse/((foundation))
+      INTERPOLATION_PATHS: env/((foundation)).yml
+      SKIP_MISSING: true
+    output_mapping:
+      interpolated-files: configuration
+  - task: apply-rbac
+    image: platform-automation-image
+    file: custom-tasks/tasks/kubectl_apply.yml
+    input_mapping:
+      env: configuration
+      config: configuration
+    params:
+      ENV_FILE: env/((foundation)).yml
+      DIR_TO_APPLY: vars/vars/((foundation))/rbac
+      TKGI_API_ENDPOINT: ((tkgi-api))
+      TKGI_CLUSTER_NAME: ((CLUSTER_NAME))
+
+- name: set-cluster-num-workers
+  plan:
+  - in_parallel:
+    - get: platform-automation-image
+      params:
+        globs: ["*aws*"]
+        unpack: true    
+    - get: platform-automation-tasks
+      params:
+        globs: ["*tasks*"]
+        unpack: true
+    - get: tkgi-cli
+      params:
+        globs: ["*tkgi*"]
+        unpack: false
+    - get: configuration
+    - get: custom-tasks
+    - get: kubectl-cli
+  - task: prepare-tasks-with-secrets
+    <<: *prepare-tasks-with-secrets
+  - task: prepare-config-with-secrets
+    <<: *prepare-config-with-secrets
+  - task: resize-cluster
+    image: platform-automation-image
+    file: custom-tasks/tasks/resize_tkgi_clusters.yml
+    input_mapping:
+      env: configuration
+      config: configuration
+    params:
+      CLUSTER_NAME: ((CLUSTER_NAME))
+      NUM_NODES: ((NUM_NODES))
+      TAGS: ((TAGS))
+      TKGI_API_ENDPOINT: ((tkgi-api))   
+      ENV_FILE: &env-path env/((foundation)).yml
+
+
+- name: upgrade-cluster
+  plan:
+  - in_parallel:
+    - get: platform-automation-image
+      params:
+        globs: ["*aws*"]
+        unpack: true    
+    - get: platform-automation-tasks
+      params:
+        globs: ["*tasks*"]
+        unpack: true
+    - get: tkgi-cli
+      params:
+        globs: ["*tkgi*"]
+        unpack: false
+    - get: configuration
+    - get: custom-tasks
+    - get: kubectl-cli
+  - task: prepare-config-with-secrets
+    <<: *prepare-config-with-secrets
+  - task: upgrade-k8s-cluster
+    image: platform-automation-image
+    file: custom-tasks/tasks/upgrade_tkgi_cluster.yml
+    input_mapping:
+      env: configuration
+      config: configuration
+    params:
+      CLUSTER_NAME: ((CLUSTER_NAME))
+      TKGI_API_ENDPOINT: ((tkgi-api))   
+      ENV_FILE: env/((foundation)).yml
+
+- name: backup-cluster
+  plan:
+  - in_parallel:
+    - get: platform-automation-image
+      params:
+        globs: ["*aws*"]
+        unpack: true    
+    - get: platform-automation-tasks
+      params:
+        globs: ["*tasks*"]
+        unpack: true
+    - get: tkgi-cli
+      params:
+        globs: ["*tkgi*"]
+        unpack: false
+    - get: configuration
+    - get: custom-tasks
+    - get: kubectl-cli
+  - task: prepare-config-with-secrets
+    <<: *prepare-config-with-secrets
+  - task: backup-k8s-cluster
+    image: platform-automation-image
+    file: custom-tasks/tasks/backup_tkgi_cluster.yml
+    input_mapping:
+      env: configuration
+      config: configuration
+    params:
+      CLUSTER_NAME: ((CLUSTER_NAME))
+      TKGI_API_ENDPOINT: ((tkgi-api))   
+      ENV_FILE: &env-path env/((foundation)).yml
+      OPSMAN_SSH_PRIVATE_KEY: ((OPSMAN_SSH_PRIVATE_KEY))
+      OPSMAN_URL: ((opsman_url))
+      OPSMAN_USERNAME: ((opsman-user.username))
+      OPSMAN_PASSWORD: ((opsman-user.password))
+      OPSMAN_PRIVATE_KEY: ((opsman-ssh.private_key))
+      SKIP_SSL_VALIDATION: "true"
+  - put: tkgi-clusters-backup
+    get_params:
+      skip_download: "true"  
+    params:
+      file: "cluster_((CLUSTER_NAME))_*.tgz"
+  
+
+- name: delete-cluster
+  plan:
+  - in_parallel:
+    - get: platform-automation-image
+      params:
+        globs: ["*aws*"]
+        unpack: true    
+    - get: platform-automation-tasks
+      params:
+        globs: ["*tasks*"]
+        unpack: true
+    - get: tkgi-cli
+      params:
+        globs: ["*tkgi*"]
+        unpack: false
+    - get: configuration
+    - get: custom-tasks
+    - get: kubectl-cli
+  - task: prepare-config-with-secrets
+    <<: *prepare-config-with-secrets
+  - task: delete-k8s-cluster
+    image: platform-automation-image
+    file: custom-tasks/tasks/delete_tkgi_cluster.yml
+    input_mapping:
+      env: configuration
+      config: configuration
+    params:
+      CLUSTER_NAME: ((CLUSTER_NAME))
+      TKGI_API_ENDPOINT: ((tkgi-api))   
+      ENV_FILE: &env-path env/((foundation)).yml
+  

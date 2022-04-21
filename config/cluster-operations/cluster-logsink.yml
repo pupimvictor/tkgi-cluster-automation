@@ -1,0 +1,16 @@
+# Configure TKGi Fluent-bit to forward logs to AWS Cloudwatch
+apiVersion: pksapi.io/v1beta1
+kind: ClusterLogSink
+metadata:
+  name: cloudwatch-logs
+spec:
+  type: cloudwatch_logs
+  output_properties:
+    Name: cloudwatch_logs
+    endpoint: monitoring.us-east-1.amazonaws.com
+    Match: "*"
+    region: us-east-1
+    log_group_name: /tanzu/k8s/audit
+    log_stream_name: np-infosec-audit
+    auto_create_group: true
+  

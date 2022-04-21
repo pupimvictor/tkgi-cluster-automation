@@ -1,0 +1,55 @@
+#AWS AZs
+AWS-Region: us-east-1
+AZ1-Name: us-east-1a
+AZ2-Name: us-east-1b
+AZ3-Name: us-east-1c
+
+#NTP Servers
+NTP-Servers: gpsclock1.host.com, gpsclock2.host.com
+
+#S3
+S3-URL: http://s3.amazonaws.com
+BoshBucketName: tanzu-bosh-tryout-681415209349
+#EC2
+KeyPairName: tanzu-nonprod
+SecurityGroupID: sg-0e58e142c3906bfd5
+
+#Networks
+#infra
+InfraAZ1:
+  SubnetID: subnet-0a1d1c5e80a999071
+  Cidr: 10.136.182.0/28
+  Dns: 10.136.128.2
+  Gateway: 10.136.182.1
+  Reserved: 10.136.182.0-10.136.182.5
+InfraAZ2:
+  SubnetID: subnet-05392b3fb768b3abb
+  Cidr: 10.136.184.0/28
+  Dns: 10.136.128.2
+  Gateway: 10.136.184.1
+  Reserved: 10.136.184.0-10.136.184.4
+InfraAZ3:
+  SubnetID: subnet-0f5a749d81b6845be
+  Cidr: 10.136.186.0/28
+  Dns: 10.136.128.2
+  Gateway: 10.136.186.1
+  Reserved: 10.136.186.0-10.136.186.4
+#nodes
+NodesAZ1:
+  SubnetID: subnet-0f93534ca1a1a3e03
+  Cidr: 10.136.183.0/24
+  Dns: 10.136.128.2
+  Gateway: 10.136.183.1
+  Reserved: 10.136.183.0-10.136.183.4
+NodesAZ2:
+  SubnetID: subnet-016d66cb2ec43f956
+  Cidr: 10.136.185.0/24
+  Dns: 10.136.128.2
+  Gateway: 10.136.185.1
+  Reserved: 10.136.185.0-10.136.185.4
+NodesAZ3:
+  SubnetID: subnet-0ba9091264224e06b
+  Cidr: 10.136.187.0/24
+  Dns: 10.136.128.2
+  Gateway: 10.136.187.1
+  Reserved: 10.136.187.0-10.136.187.4

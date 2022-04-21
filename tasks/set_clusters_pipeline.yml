@@ -1,0 +1,38 @@
+---
+platform: linux
+
+inputs:
+- name: platform-automation-tasks
+- name: custom-tasks # source containing the custom task file
+- name: env # contains the env file with target OpsMan Information
+- name: config # contains the platform config
+- name: pipelines # contains the pipeline to be deployed 
+- name: tkgi-cli # contains the clusters config
+- name: tkgi-cli # tkgi cli
+- name: yq-cli # tkgi cli
+- name: fly-cli # tkgi cli
+
+
+params:
+  ENV_FILE: env.yml
+  # - Required
+  CLUSTER_CONFIG_FILE: 
+  # - Required
+  PIPELINE_FILE:
+  # - Required
+  CONCOURSE_URL:
+  # - Required
+  CONCOURSE_TARGET:
+  # - Required
+  CONCOURSE_TEAM:
+  # - Required
+  CONCOURSE_USERNAME:
+  # - Required
+  CONCOURSE_PASSWORD:
+  # - Required
+  CONCOURSE_CERT:
+  # - OPTIONAL
+
+  
+run:
+  path: custom-tasks/tasks/set_clusters_pipeline.sh

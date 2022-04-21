@@ -1,0 +1,25 @@
+---
+# FOUNDATION SPECIFIC
+foundation: "tryout-useast1"
+infrastructure_glob: "*vsphere*"
+
+#Credhub
+credhub_server: https://ci.run.haas-485.pez.vmware.com:8844
+
+#CONCOURSE
+concourse_url: https://ci.run.haas-485.pez.vmware.com/
+concourse_target: to
+concourse_team: "tryout-useast1"
+
+# VERSIONS
+platform_automation_version: "5.0.0" # Only bump Platform Automation version while making no other version or configuration changes
+
+# OPSMAN
+opsman_url: "https://opsmgr-02.haas-485.pez.vmware.com/"
+
+# TKGI
+tkgi-api: "api.pks.haas-485.pez.vmware.com"
+
+# PIPELINE CONFIG
+floating_stemcells: "true"
+recreate_all_vms: "false"

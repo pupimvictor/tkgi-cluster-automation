@@ -1,0 +1,9 @@
+ADDON_VERSION: 1.3.2
+ENVIRONMENTID: dd1c8700-5411-4422-8d64-3e5234c70afb
+APITOKEN: PARtNlxNSAKEnm6coU3PB 
+APIURL: https://dynatraceoa.company.com/e/env-id/api 
+DOWNLOADURL: ""
+PROXY: "" 
+
+HOSTPROPS: Team=DigitalFactory 
+INSTALLERARGS: ""

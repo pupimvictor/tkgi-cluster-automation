@@ -1,0 +1,17 @@
+---
+platform: linux
+
+inputs:
+- name: platform-automation-tasks
+- name: custom-tasks # source containing the custom task file
+- name: env # contains the env file with target OpsMan Information
+- name: config # contains the platform config 
+- name: tkgi-cli # tkgi cli
+
+params:
+  ENV_FILE: env.yml
+  TKGI_API_ENDPOINT:
+  
+  CLUSTER_NAME: 
+run:
+  path: custom-tasks/tasks/delete_tkgi_cluster.sh

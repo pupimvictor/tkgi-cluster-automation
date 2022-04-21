@@ -1,0 +1,17 @@
+---
+platform: linux
+inputs:
+  - name: custom-tasks # source containing the custom task file
+  - name: env
+
+params:
+  ENV_FILE: env.yml
+  TKGI_API_ENDPOINT:
+
+  ADMIN_ROLE_GROUPS: CN=TKGI-Clusters-Admin,OU=TANZU,OU=Groups,OU=Corporate,DC=company,DC=com
+  ADMIN_READ_ROLE_GROUPS: CN=TKGI-Clusters-Admin-Read,OU=TANZU,OU=Groups,OU=Corporate,DC=company,DC=com
+  MANAGE_ROLE_GROUPS: CN=TKGI-Clusters-Manage,OU=TANZU,OU=Groups,OU=Corporate,DC=company,DC=com
+  
+
+run:
+  path: custom-tasks/tasks/map_ad_to_uaa.sh

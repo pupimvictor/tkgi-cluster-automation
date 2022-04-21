@@ -1,0 +1,28 @@
+---
+platform: linux
+
+inputs:
+- name: platform-automation-tasks
+- name: custom-tasks # source containing the custom task file
+- name: env # contains the env file with target OpsMan Information
+- name: config # contains the platform config 
+- name: tkgi-cli # tkgi cli
+
+params:
+  ENV_FILE: env.yml
+  TKGI_API_ENDPOINT:
+  CLUSTER_NAME: 
+  # - Required
+  EXTERNAL_HOSTNAME:
+  # - Required
+  PLAN:
+  # - Required
+  K8S_PROFILE: ""
+
+  NETWORK_PROFILE: ""
+
+  NUM_NODES: ""
+
+  TAGS: ""
+run:
+  path: custom-tasks/tasks/create_tkgi_clusters.sh

@@ -1,0 +1,17 @@
+---
+platform: linux
+inputs:
+  - name: custom-tasks
+  - name: configuration
+
+params:
+  TKGI_API_ENDPOINT:
+  TKGI_CLUSTER_NAME:
+  OM_USERNAME:
+  OM_PASSWORD:
+  TMC_API_TOKEN:
+  ENV_NAME:
+  DEBUG: # set to non-null to debug script
+
+run:
+  path: custom-tasks/platform-automation/tasks/deploy-tmc-agent.sh

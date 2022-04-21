@@ -1,0 +1,16 @@
+
+---
+platform: linux
+
+inputs:
+- name: platform-automation-tasks
+- name: custom-tasks # source containing the custom task file
+- name: env # contains the env file with target OpsMan Information
+- name: tkgi-cli # tkgi cli
+- name: config
+params:
+  ENV_FILE: env.yml
+  TKGI_API_ENDPOINT:
+
+run:
+  path: custom-tasks/tasks/create_oidc_k8s_profile.sh

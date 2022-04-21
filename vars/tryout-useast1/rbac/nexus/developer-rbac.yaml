@@ -1,0 +1,67 @@
+###############################################################
+#
+# Creator: host Cloud Security
+# Description: Create RBAC for Developers
+#              Grant permissions via "view" default cluster role
+#              Additional permissions granted via cluster role
+#              cf:developer:more-perms
+#
+###############################################################
+
+###############################################################
+#
+# ClusterRoleBinding for Developers that map to default cluster
+# "view" role
+#
+###############################################################
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cf:developer:view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: oidc:AWS-K8sDeveloper-Tryout
+
+---
+###############################################################
+#
+# ClusterRole for Developers that grant additional permissions
+#
+###############################################################
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cf:developer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+
+---
+###############################################################
+#
+# ClusterRoleBinding for Developers that map to cf:developer
+# cluster role that grant additional permissions
+#
+###############################################################
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cf:developer:more-perms
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cf:developer
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: oidc:AWS-K8sDeveloper-Tryout

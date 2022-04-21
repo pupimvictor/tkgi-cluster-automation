@@ -1,0 +1,26 @@
+---
+platform: linux
+
+inputs:
+- name: platform-automation-tasks
+- name: custom-tasks # source containing the custom task file
+- name: env # contains the env file with target OpsMan Information
+- name: config # contains the platform config 
+- name: tkgi-cli
+- name: kubectl-cli
+
+params:
+  ENV_FILE: env.yml
+  TKGI_API_ENDPOINT:
+  # - Required
+  # - Filepath of the clusters config YAML
+  TKGI_CLUSTER_NAME:
+  # - Required
+  # - Name of the cluster to apply changes
+  KUBECTL_EDIT: 
+  # - Required
+  # - edit command to be run
+  
+
+run:
+  path: custom-tasks/tasks/kubectl_edit.sh

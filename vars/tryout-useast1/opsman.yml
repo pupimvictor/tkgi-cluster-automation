@@ -1,0 +1,9 @@
+region-name: us-east-1
+opsman-name: tkgi-ops-manager-tryout
+vpc-subnet-id: subnet-0a1d1c5e80a999071
+security-group-id: sg-0e4ced48fd137a92b
+keypair-name: tanzu-nonprod
+private-ip: 10.136.182.5
+om-iam-profile-name: OpsManagerInstanceProfile-Tryout
+om-assume-role: arn:aws:iam::681415209349:role/Ops-Manager-Role-TryOut
+#

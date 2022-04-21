@@ -1,0 +1,17 @@
+---
+platform: linux
+
+inputs:
+- name: platform-automation-tasks
+- name: custom-tasks # source containing the custom task file
+- name: env # contains the env file with target OpsMan Information
+- name: config # contains the platform config 
+
+params:
+  ENV_FILE: env.yml
+  CFN_FILE: k8s-clusters.json
+  # - Required
+  # - Filepath of the clusters config YAML
+
+run:
+  path: custom-tasks/tasks/create-k8sapi-nlb.sh

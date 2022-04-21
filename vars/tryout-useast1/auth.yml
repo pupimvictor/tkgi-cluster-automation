@@ -1,0 +1,5 @@
+ldap_url: ldaps://ldap.host.com
+opsman_admin_ad_group: Tanzu-Ops-Manager-TO
+properties_uaa_ldap_credentials:
+  identity: ((service-account.username))
+  password: ((service-account.password))

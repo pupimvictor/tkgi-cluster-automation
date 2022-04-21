@@ -1,0 +1,8 @@
+---
+target: https://opsmgr-02.haas-485.pez.vmware.com
+connect-timeout: 30
+request-timeout: 1800
+skip-ssl-validation: true
+username: ((opsman-service-account.username))
+password: ((opsman-service-account.password))
+decryption-passphrase: ((tkgi_opsman_decryption_passphrase))

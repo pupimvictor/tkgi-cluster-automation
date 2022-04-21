@@ -1,0 +1,74 @@
+###############################################################
+#
+# Creator: host Cloud Security
+# Description: Create RBAC for Security Admin role
+#              - RBAC Group: cf-security-admin
+#              - Create two ClusterRoleBinding to bind RBAC group 
+#                to default ClusterRole "view" and custom
+#                ClusterRole "cf:security-admin"
+#              - cf:security-admin grants additional permissions
+#                for role, rolebinding, clusterrole, and
+#                clusterrolebinding
+#
+###############################################################
+
+###############################################################
+#
+# ClusterRole with permissions to get/list roles, rolebindings,
+# clusterroles, and clusterrolebindings
+#
+###############################################################
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cf:security-admin
+rules:
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  - rolebindings
+  - clusterroles
+  - clusterrolebindings
+  verbs:
+  - get
+  - list
+---
+
+###############################################################
+#
+# ClusterRoleBinding that references "view" ClusterRole
+#
+###############################################################
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cf:security-admin:view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: oidc:AWS-K8sSecurityAdmin-Tryout
+---
+
+###############################################################
+#
+# ClusterRoleBinding that references
+# cf:security-admin ClusterRole
+#
+###############################################################
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cf:security-admin:more-perms
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cf:security-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: oidc:AWS-K8sSecurityAdmin-Tryout

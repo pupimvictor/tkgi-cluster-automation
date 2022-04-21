@@ -1,0 +1,29 @@
+---
+platform: linux
+
+inputs:
+  - name: platform-automation-tasks
+  - name: env # contains the env file with target OpsMan Information
+  - name: tkgi-cli # tkgi cli
+  - name: custom-tasks
+outputs:
+  - name: tkgi-clusters-backup
+    # This will output a *.tgz of the entire backup.
+    # The filename includes the timestamp.
+
+
+params:
+  ENV_FILE: env.yml
+  # - Required
+  # - Filepath of the env config YAML
+  # - The path is relative to the root of the `env` input
+  TKGI_API_ENDPOINT:
+
+
+  CLUSTER_NAME:
+  # - Required
+  # - The name of the product config to be exported
+  OPSMAN_SSH_PRIVATE_KEY: 
+
+run:
+  path: custom-tasks/tasks/backup_tkgi_cluster.sh

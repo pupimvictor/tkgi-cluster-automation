@@ -1,0 +1,40 @@
+clusters:
+# - CLUSTER_NAME: nexus-tryout-01
+#   PLAN: small
+#   EXTERNAL_HOSTNAME: nexus-tryout-01.host.com
+#   TAGS: "Access:internet"
+#   K8S_PROFILE: ""
+#   NETWORK_PROFILE: ""
+#   NUM_NODES: ""
+
+# - CLUSTER_NAME: nexus-tryout-02
+#   PLAN: small
+#   EXTERNAL_HOSTNAME: nexus-tryout-02.host.com
+#   TAGS: "foo:bar,Access:internet"
+#   K8S_PROFILE: ""
+#   NETWORK_PROFILE: ""
+#   NUM_NODES: ""
+  
+# - CLUSTER_NAME: nexus-tryout-03
+#   PLAN: small
+#   EXTERNAL_HOSTNAME: nexus-tryout-03.host.com
+#   TAGS: "foo:bar,Access:internet"
+#   K8S_PROFILE: ""
+#   NETWORK_PROFILE: ""
+#   NUM_NODES: ""
+
+- CLUSTER_NAME: cf-to-infosec01
+  PLAN: small
+  EXTERNAL_HOSTNAME: cf-to-infosec01.host.com
+  TAGS: "Access:internet,TechType:eks,DataAccess:nonsensitive,Owner:CloudEnginnering,Name:cf-to-infosec01-worker-node,Environment:infosec-to,CostCenterIT:004PH,datadog:monitored-with-agent,SupportDistList:svi-team@host.com,DepartmentName:CloudEngineering"
+  K8S_PROFILE: "oidc-config-to"
+  NETWORK_PROFILE: ""
+  NUM_NODES: "2"
+
+- CLUSTER_NAME: cf-to-nexus-02
+  PLAN: small
+  EXTERNAL_HOSTNAME: cf-to-nexus-02.host.com
+  TAGS: "Access:internet,TechType:eks,DataAccess:nonsensitive,Owner:CloudEnginnering,Name:cf-to-nexus-02-worker-node,Environment:nexus-to,CostCenterIT:004PH,datadog:monitored-with-agent,SupportDistList:svi-team@host.com,DepartmentName:CloudEngineering"
+  K8S_PROFILE: "oidc-config-to"
+  NETWORK_PROFILE: ""
+  NUM_NODES: "2"

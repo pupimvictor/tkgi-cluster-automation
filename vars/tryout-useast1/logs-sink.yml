@@ -1,0 +1,2 @@
+FLUENTBIT-HOSTNAME: fluent-bit.pks-system.svc.cluster.local
+FLUENTBIT-PORT: 24224
